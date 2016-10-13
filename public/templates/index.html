@@ -3,6 +3,10 @@
     <a ng-click="errorMessage = null" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Error! </strong> {{ errorMessage }}
   </div>
+  <div ng-show="eventSelectedId != null" class="event-details">
+    <div class="event-details-close" ng-click="eventSelectedId = null"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
+    <pre ng-bind-html="eventSelectedSource"></pre>
+  </div>
   <div class='no-event-message' ng-show='events.length !== 0 && firstEventReached'>Oldest event reached.</div>
   <div class='no-event-message' ng-show='showNoEventsMessage'>No events found.<br>
     <div ng-show="isTimeRangeSearch()" class='time-range'>Time range searched: {{ noEventErrorStartTime }} to Now </div>
@@ -12,7 +16,7 @@
       <time>{{ event.display_timestamp }}</time>
       <span class='host'><a href ng-click="onHostSelected(event.hostname)">{{ event.hostname }}</a></span>
       <span class='program'><a ng-click="onProgramClick(event.program)">{{ event.program }}:</a></span>
-      <span class="message">{{ event.message }}</span>
+      <span class="message"><a ng-click="onMessageClick(event.id, event.type)">{{ event.message }}</a></span>
     </li>
   </ul>
 

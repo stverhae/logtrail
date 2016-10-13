@@ -105,6 +105,7 @@ module.exports = function (server) {
       }
       //console.log(JSON.stringify(searchRequest));
       callWithRequest(request,'search',searchRequest).then(function (resp) {
+        //console.log(resp);
         reply({
           ok: true,
           resp: convertToClientFormat(config, resp)
@@ -188,4 +189,44 @@ module.exports = function (server) {
       });
     }
   });
+
+
+  //Get the JSON source of a specific event
+  server.route({
+    method: ['POST'],
+    path: '/logtrail/source',
+    handler: function (request,reply) {
+      var config = require('../../logtrail.json');
+      var callWithRequest = server.plugins.elasticsearch.callWithRequest;
+      var rawHostField = config.fields.mapping.hostname + ".raw";
+      var eventId =  request.payload.eventId;
+      var eventType = request.payload.eventType;
+
+      var sourceRequest = {
+        index: 'bnxt',
+        type: 'radijsboer',
+        id: eventId
+      }
+
+      console.log(sourceRequest)
+      callWithRequest(request,'get',sourceRequest).then(function (resp) {
+        console.log(resp);
+        reply({
+          ok: true,
+          resp: resp
+        });
+      }).catch(function (resp) {
+        if(resp.isBoom) {
+          reply(resp);
+        } else {
+          console.error("Error while fetching event source",resp);
+          reply({
+            ok: false,
+            resp: resp
+          });
+        }
+      });
+    }
+  });
+
 };

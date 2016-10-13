@@ -31,7 +31,7 @@ require('ui/routes')
 document.title = 'LogTrail - Kibana';
 
 app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, courier,
-   $window, $interval, $http, $document, $timeout, $location) {
+   $window, $interval, $http, $document, $timeout, $location, $sce) {
   $scope.title = 'LogTrail';
   $scope.description = 'Plugin to view, search & tail logs in Kibana';
   $scope.userSearchText = null;
@@ -48,6 +48,8 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
   $scope.errorMessage = null;
   $scope.noEventErrorStartTime = null;
   $scope.showNoEventsMessage = false;
+  $scope.eventSelectedId = null
+  $scope.eventSelectedSource = null
   var updateViewInProgress = false;
   var tailTimer = null;
   var searchText = null;
@@ -387,6 +389,25 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
     $scope.onSearchClick();
   };
 
+
+  $scope.onMessageClick = function(eventId, eventType) {
+    $scope.eventSelectedId = eventId
+    var request = {
+      eventId: eventId,
+      eventType: eventType
+    };
+
+    return $http.post(chrome.addBasePath('/logtrail/source'), request).then(function (resp) {
+      if (resp.data.ok) {
+        var str = JSON.stringify(resp.data.resp._source, undefined, 4);
+        $scope.eventSelectedSource = $sce.trustAsHtml(syntaxHighlight(str))
+      } else {
+        console.error('Error while fetching fetching ' , resp);
+        $scope.errorMessage = 'Exception while getting search :' + resp.data.resp.msg;
+      }
+    });
+  }
+
   $scope.getLiveTailStatus = function () {
     if ($scope.liveTailStatus === 'Live') {
       return 'PAUSE';
@@ -492,3 +513,23 @@ modules.get('logtrail').directive('clickOutside', function ($document) {
     }
   };
 });
+
+
+function syntaxHighlight(json) {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}

@@ -408,7 +408,7 @@ html,body {
 
 .no-event-message {
 	text-align: center;
-  padding-top: 2em;
+  padding-top: 3em;
 	padding-bottom: 1em;
   font-size: xx-large;
   font-family: inherit;
@@ -422,4 +422,35 @@ html,body {
 	position: fixed;
 	width: 97%;
 	top: 4em;
+}
+
+.event-details {
+	position: fixed; top: 80px; right:0;
+}
+
+div.event-details-close {
+	color: #444;
+	position: absolute;
+  right: 22px;
+  top: 18px;
+}
+
+/*JSON pretty print styles*/
+.event-details pre { margin: 15px; background-color: white !important; max-height: 600px; }
+.event-details .string { color: rgb(3, 106, 7); }
+.event-details .number { color: rgb(0, 0, 205); }
+.event-details .boolean { color: blue; }
+.event-details .null { color: magenta; }
+.event-details .key { color: rgb(49, 132, 149); }
+
+
+.message a {
+	color: #B0B0B0 !important;
+}
+
+
+li.logo {
+	width: 450px !important;
+	height: 70px !important;
+
 }
