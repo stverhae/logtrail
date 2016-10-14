@@ -12,8 +12,8 @@
     "mapping" : {
         "timestamp" : "@timestamp",
         "display_timestamp" : "@timestamp",
-        "hostname" : "hostname",
-        "program": "container.servicename",
+        "hostname" : "type",
+        "program": "@container.servicename",
         "message": "message"
     }
   }

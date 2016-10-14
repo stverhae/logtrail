@@ -5,7 +5,7 @@
   </div>
   <div ng-show="eventSelectedId != null" class="event-details">
     <div class="event-details-close" ng-click="eventSelectedId = null"><i class="fa fa-times fa-2x" aria-hidden="true"></i></div>
-    <pre ng-bind-html="eventSelectedSource"></pre>
+    <pre id="json-details-view"></pre>
   </div>
   <div class='no-event-message' ng-show='events.length !== 0 && firstEventReached'>Oldest event reached.</div>
   <div class='no-event-message' ng-show='showNoEventsMessage'>No events found.<br>
@@ -13,10 +13,10 @@
   </div>
   <ul class="events">
     <li id="{{ event.id }}" ng-repeat="event in events" on-last-repeat infinite-scroll>
-      <time>{{ event.display_timestamp }}</time>
+      <time>{{ event.display_timestamp | date:"dd/MM/yyyy HH:mm:ss" }}</time>
       <span class='host'><a href ng-click="onHostSelected(event.hostname)">{{ event.hostname }}</a></span>
       <span class='program'><a ng-click="onProgramClick(event.program)">{{ event.program }}:</a></span>
-      <span class="message"><a ng-click="onMessageClick(event.id, event.type)">{{ event.message }}</a></span>
+      <span class="message"><a ng-click="onMessageClick(event.id, event.hostname)">{{ event.message }}</a></span>
     </li>
   </ul>
 
@@ -52,6 +52,11 @@
         <li ng-repeat="host in hosts"><a href ng-click="onHostSelected(host.key)">{{host.key}}</a></li>
         <li> <a href ng-click="onHostSelected('*')"> [ All Systems ] </a></li>
       </ul>
+    </div>
+    <div class="index-picker">
+      <form class="form-inline search-form" ng-submit="onSearchClick()">
+        <input class="form-control" type="text" ng-model="userIndex"></input>
+    </form>
     </div>
     <div class="pull-right live-tail-button">
       <button class="tail-status-btn" ng-click="toggleLiveTail()" >{{getLiveTailStatus()}}</button>

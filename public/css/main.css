@@ -454,3 +454,21 @@ li.logo {
 	height: 70px !important;
 
 }
+
+div.index-picker {
+	margin-right: 5px;
+}
+
+div.json-object {
+	margin: -16px 0 -16px 29px;
+	cursor: pointer;
+}
+
+div.json-object-collapsed {
+	height: 16px;
+	overflow: hidden;
+	border-left: 3px solid purple;
+	padding-left: 4px;
+	background-color: #ddddff;
+	margin-bottom: -14px;
+}

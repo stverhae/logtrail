@@ -38,7 +38,7 @@ module.exports = function (server) {
 
       //Search Request bbody
       var searchRequest = {
-        index: config.es.default_index,
+        index: request.payload.index,
         size: config.max_buckets,
         body : {
           sort : [{}],
@@ -72,7 +72,7 @@ module.exports = function (server) {
           term : {
           }
         };
-        var rawHostField = config.fields.mapping.hostname + ".raw";
+        var rawHostField = config.fields.mapping.hostname;
         termQuery.term[rawHostField] = request.payload.hostname;
         searchRequest.body.query.filtered.filter.bool.must.push(termQuery);
       }
@@ -131,7 +131,7 @@ module.exports = function (server) {
     handler: function (request,reply) {
       var config = require('../../logtrail.json');
       var callWithRequest = server.plugins.elasticsearch.callWithRequest;
-      var rawHostField = config.fields.mapping.hostname + ".raw";
+      var rawHostField = config.fields.mapping.hostname;
       var hostAggRequest = {
         index: config.es.default_index,
         body : {
@@ -169,9 +169,8 @@ module.exports = function (server) {
           }
         };
       }
-
       callWithRequest(request,'search',hostAggRequest).then(function (resp) {
-        //console.log(resp);//.aggregations.hosts.buckets);
+        console.log(resp);//.aggregations.hosts.buckets);
         reply({
           ok: true,
           resp: resp.aggregations.hosts.buckets
@@ -198,13 +197,14 @@ module.exports = function (server) {
     handler: function (request,reply) {
       var config = require('../../logtrail.json');
       var callWithRequest = server.plugins.elasticsearch.callWithRequest;
-      var rawHostField = config.fields.mapping.hostname + ".raw";
+      var rawHostField = config.fields.mapping.hostname;
       var eventId =  request.payload.eventId;
       var eventType = request.payload.eventType;
+      var eventIndex = request.payload.eventIndex;
 
       var sourceRequest = {
-        index: 'bnxt',
-        type: 'radijsboer',
+        index: eventIndex,
+        type: eventType,
         id: eventId
       }
 

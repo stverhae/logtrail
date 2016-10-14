@@ -50,6 +50,7 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
   $scope.showNoEventsMessage = false;
   $scope.eventSelectedId = null
   $scope.eventSelectedSource = null
+  $scope.userIndex = null
   var updateViewInProgress = false;
   var tailTimer = null;
   var searchText = null;
@@ -85,6 +86,7 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
       if (resp.data.ok) {
         config = resp.data.config;
         console.info('connection to elasticsearch successful');
+        $scope.userIndex = config.es.default_index
         //Initialize app views on validate successful
         setupHostsList();
         if ($scope.pickedDateTime == null) {
@@ -117,7 +119,8 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
       timestamp: timestamp,
       rangeType: rangeType,
       order: order,
-      hostname: $scope.selectedHost
+      hostname: $scope.selectedHost,
+      index: $scope.userIndex
     };
 
     return $http.post(chrome.addBasePath('/logtrail/search'), request).then(function (resp) {
@@ -390,17 +393,21 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
   };
 
 
+
   $scope.onMessageClick = function(eventId, eventType) {
     $scope.eventSelectedId = eventId
     var request = {
       eventId: eventId,
-      eventType: eventType
+      eventType: eventType,
+      eventIndex: $scope.userIndex
     };
 
     return $http.post(chrome.addBasePath('/logtrail/source'), request).then(function (resp) {
       if (resp.data.ok) {
         var str = JSON.stringify(resp.data.resp._source, undefined, 4);
-        $scope.eventSelectedSource = $sce.trustAsHtml(syntaxHighlight(str))
+        //$scope.eventSelectedSource = $sce.trustAsHtml(syntaxHighlight(str))
+        $("#json-details-view").html(syntaxHighlight(str));
+        $('.json-object').click(function() { $(this).toggleClass('json-object-collapsed');});
       } else {
         console.error('Error while fetching fetching ' , resp);
         $scope.errorMessage = 'Exception while getting search :' + resp.data.resp.msg;
@@ -517,7 +524,7 @@ modules.get('logtrail').directive('clickOutside', function ($document) {
 
 function syntaxHighlight(json) {
     json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    json = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'number';
         if (/^"/.test(match)) {
             if (/:$/.test(match)) {
@@ -532,4 +539,13 @@ function syntaxHighlight(json) {
         }
         return '<span class="' + cls + '">' + match + '</span>';
     });
+
+    //wrap objects
+    json = json.replace(/(<span.*<\/span> {[^}]*},)/g, '<div class="json-object">$1</div>');
+    //wrap arrays
+    json = json.replace(/(<span.*<\/span> \[[^\]]*\],)/g, '<div class="json-object">$1</div>');
+    //auto collapse @... fields
+    json = json.replace(/(<div class="json-object)("><span class="key">"@.*":<\/span>)/g, '$1 json-object-collapsed$2')
+
+    return json;
 }
