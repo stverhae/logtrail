@@ -445,7 +445,7 @@ div.event-details-close {
 
 
 .message a {
-	color: #B0B0B0 !important;
+	color: #dddddd !important;
 }
 
 
@@ -471,4 +471,40 @@ div.json-object-collapsed {
 	padding-left: 4px;
 	background-color: #ddddff;
 	margin-bottom: -14px;
+}
+
+
+.events span.level
+{
+	text-transform: uppercase;
+}
+
+.events span.info
+{
+	color: #bbbbff;
+}
+
+.events span.debug
+{
+	color: #55cc55;
+}
+
+.events span.warning
+{
+	color: #ffff55;
+}
+.events span.error
+{
+	color: red;
+}
+.events span.fatal
+{
+	color: red;
+	font-weight: bold;
+}
+
+.events span.panic
+{
+	color: red;
+	font-weight: bold;
 }

@@ -392,7 +392,7 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
     $scope.onSearchClick();
   };
 
-
+  var ignoreFields = ["host", "@timestamp", "@version", "port"];
 
   $scope.onMessageClick = function(eventId, eventType) {
     $scope.eventSelectedId = eventId
@@ -404,7 +404,13 @@ app.controller('logtrail', function ($scope, kbnUrl, $route, $routeParams, es, c
 
     return $http.post(chrome.addBasePath('/logtrail/source'), request).then(function (resp) {
       if (resp.data.ok) {
-        var str = JSON.stringify(resp.data.resp._source, undefined, 4);
+        var json = resp.data.resp._source;
+        var i;
+        for (i in ignoreFields) {
+          delete json[ignoreFields[i]];
+        }
+
+        var str = JSON.stringify(json, undefined, 4);
         //$scope.eventSelectedSource = $sce.trustAsHtml(syntaxHighlight(str))
         $("#json-details-view").html(syntaxHighlight(str));
         $('.json-object').click(function() { $(this).toggleClass('json-object-collapsed');});
@@ -520,6 +526,7 @@ modules.get('logtrail').directive('clickOutside', function ($document) {
     }
   };
 });
+
 
 
 function syntaxHighlight(json) {

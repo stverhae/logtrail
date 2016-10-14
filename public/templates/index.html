@@ -15,6 +15,7 @@
     <li id="{{ event.id }}" ng-repeat="event in events" on-last-repeat infinite-scroll>
       <time>{{ event.display_timestamp | date:"dd/MM/yyyy HH:mm:ss" }}</time>
       <span class='host'><a href ng-click="onHostSelected(event.hostname)">{{ event.hostname }}</a></span>
+      [<span class='level {{ event.level }}'>{{ event.level | limitTo: 5 }}</span>]
       <span class='program'><a ng-click="onProgramClick(event.program)">{{ event.program }}:</a></span>
       <span class="message"><a ng-click="onMessageClick(event.id, event.hostname)">{{ event.message }}</a></span>
     </li>

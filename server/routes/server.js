@@ -16,6 +16,11 @@ function convertToClientFormat(config, esResponse) {
     event['hostname'] = source[config.fields.mapping['hostname']];
     event['message'] = source[config.fields.mapping['message']];
     event['program'] = source[config.fields.mapping['program']];
+    var level = source['level'];
+    if (level == 'info') {
+      level = 'info ';
+    }
+    event['level'] = level;
     clientResponse.push(event);
   }
   return clientResponse;
